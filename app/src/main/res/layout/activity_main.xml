@@ -2,17 +2,148 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#212121"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="#212121"
+    tools:context=".MainActivity"
+    tools:layout_editor_absoluteY="81dp">
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginStart="35dp"
+        android:background="@drawable/box"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginStart="35dp"
+        android:background="@drawable/box"
+        app:layout_constraintBottom_toTopOf="@+id/textView5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/box"
+        app:layout_constraintBottom_toTopOf="@+id/textView4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="45dp"
+        android:layout_marginLeft="61dp"
+        android:layout_marginRight="45dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/box"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginEnd="45dp"
+        android:layout_marginLeft="61dp"
+        android:layout_marginRight="45dp"
+        android:layout_marginStart="61dp"
+        android:background="@drawable/box"
+        app:layout_constraintBottom_toTopOf="@+id/textView8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginEnd="45dp"
+        android:layout_marginLeft="61dp"
+        android:layout_marginRight="45dp"
+        android:layout_marginStart="61dp"
+        android:background="@drawable/box"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView5" />
+
+    <TextView
+        android:id="@+id/rpm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="410dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="180dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginStart="180dp"
+        android:layout_marginTop="8dp"
+        android:text="RPM"
+        android:textColor="@android:color/white"
+        android:textSize="27sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/textView2"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <TextView
         android:id="@+id/rpm_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="510dp"
+        android:layout_marginEnd="105dp"
+        android:layout_marginLeft="9dp"
+        android:layout_marginRight="105dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="11dp"
+        android:text="0"
         android:textColor="@android:color/white"
-        android:text="0" />
+        android:textSize="35sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="352dp"
+        android:layout_height="37dp"
+
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="DISCONNECT"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
 

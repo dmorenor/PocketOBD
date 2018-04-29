@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     RPMCommand engineRpmCommand = new RPMCommand();
                     engineRpmCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    rpmView.setText("RPM: " + engineRpmCommand.getFormattedResult());
+                    rpmView.setText("RPM: " + engineRpmCommand.getCalculatedResult());
                 }
                 catch (Exception e){
                     // handle errors
