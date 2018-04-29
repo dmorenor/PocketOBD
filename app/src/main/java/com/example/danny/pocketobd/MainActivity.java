@@ -8,9 +8,12 @@ import android.content.DialogInterface;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
@@ -22,16 +25,27 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
+
 public class MainActivity extends AppCompatActivity {
     String deviceAddress;
     BluetoothSocket mmSocket;
+    Boolean btConnected = false;
+    Boolean skConnected = false;
+    Context contex;
     int duration = Toast.LENGTH_SHORT;
+    Runnable runnable;
+    Handler handler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        btConnect();
+    }
+
+    public void btConnect() {
         ArrayList deviceStrs = new ArrayList();
         final ArrayList devices = new ArrayList();
 
@@ -70,35 +84,77 @@ public class MainActivity extends AppCompatActivity {
                     mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
                     mmSocket.connect();
 
-                    Context contex = getApplicationContext();
-
-                    Toast toast = Toast.makeText(contex, "Connection successful", duration);
+                    contex = getApplicationContext();
+                    Toast toast = Toast.makeText(contex, "Bluetooth connection successful", duration);
                     toast.show();
+                    btConnected = true;
                 }
                 catch (IOException e){
                     // handle errors
-                    Context contex = getApplicationContext();
-
-                    Toast toast = Toast.makeText(contex, "Connection error: " + e.toString(), duration);
+                    contex = getApplicationContext();
+                    Toast toast = Toast.makeText(contex, "Bluetooth connection error: " + e.toString(), duration);
                     toast.show();
                 }
 
-                try {
-                    new EchoOffCommand().run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    new LineFeedOffCommand().run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    new TimeoutCommand(125).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    new SelectProtocolCommand(ObdProtocols.AUTO).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                } catch (Exception e) {
-                    // handle errors
-                    Context contex = getApplicationContext();
+                if(btConnected == true) {
+                    socketConnect();
 
-                    Toast toast = Toast.makeText(contex, "W" + e.toString(), duration);
-                    toast.show();
+                    if(skConnected == true) {
+                        rpmStat();
+                    }
                 }
             }
         });
 
         alertDialog.setTitle("Choose Bluetooth device");
         alertDialog.show();
+    }
+
+    public void socketConnect() {
+        try {
+            new EchoOffCommand().run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+            new LineFeedOffCommand().run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+            new TimeoutCommand(125).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+            new SelectProtocolCommand(ObdProtocols.AUTO).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+
+            contex = getApplicationContext();
+            Toast toast = Toast.makeText(contex, "Connection successful", duration);
+            toast.show();
+            skConnected = true;
+        } catch (Exception e) {
+            // handle errors
+            contex = getApplicationContext();
+            Toast toast = Toast.makeText(contex, "API Error: " + e.toString(), duration);
+            toast.show();
+        }
+    }
+
+    public void rpmStat() {
+        final TextView rpmView = (TextView) findViewById(R.id.rpm_id);
+
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    RPMCommand engineRpmCommand = new RPMCommand();
+                    engineRpmCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    rpmView.setText("RPM: " + engineRpmCommand.getFormattedResult());
+                }
+                catch (Exception e){
+                    // handle errors
+                    contex = getApplicationContext();
+                    Toast toast = Toast.makeText(contex, "RPM Error: " + e.toString(), duration);
+                    toast.show();
+                }
+                handler.postDelayed(runnable, 250);
+            }
+        };
+        handler.post(runnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(runnable);
     }
 }

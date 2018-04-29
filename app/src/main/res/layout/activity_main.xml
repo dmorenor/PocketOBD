@@ -8,9 +8,11 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/rpm_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:text="0" />
 
 </android.support.constraint.ConstraintLayout>
 
