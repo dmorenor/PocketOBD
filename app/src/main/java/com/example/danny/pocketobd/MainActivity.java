@@ -183,20 +183,20 @@ public class MainActivity extends AppCompatActivity {
                     RPMCommand engineRpmCommand = new RPMCommand();
                     SpeedCommand mphCommand = new SpeedCommand();
                     ThrottlePositionCommand tposCommand = new ThrottlePositionCommand();
-                    FuelLevelCommand fuelCommand = new FuelLevelCommand();
+                    FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
                     FindFuelTypeCommand fuelTypeCommand = new FindFuelTypeCommand();
 
                     engineRpmCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     mphCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     tposCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    fuelCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    fuelLevelCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     fuelTypeCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
 
                     rpmView.setText(engineRpmCommand.getCalculatedResult());
                     mphView.setText(mphCommand.getCalculatedResult());
-                    tposView.setText(tposCommand.getCalculatedResult());
-                    fuelView.setText(fuelCommand.getCalculatedResult());
-                    fuelTypeView.setText(fuelTypeCommand.getName());
+                    tposView.setText(Float.toString(tposCommand.getPercentage()));
+                    fuelView.setText(Float.toString(fuelLevelCommand.getFuelLevel()));
+                    fuelTypeView.setText(fuelTypeCommand.getCalculatedResult());
                 }
                 catch (Exception e){
                     // handle errors
