@@ -6,18 +6,29 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
+import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
+import com.github.pires.obd.commands.fuel.FindFuelTypeCommand;
+import com.github.pires.obd.commands.fuel.FuelLevelCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
+import com.github.pires.obd.enums.FuelType;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
@@ -37,12 +48,41 @@ public class MainActivity extends AppCompatActivity {
     Handler handler = new Handler();
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final Button button = (Button) findViewById(R.id.button);
 
         btConnect();
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(btConnected == true) {
+                    handler.removeCallbacks(runnable);
+
+                    try {
+                        mmSocket.close();
+                        button.setText("CONNECT");
+                        btConnected = false;
+                    }
+                    catch (IOException e) {
+                        // Error
+                        contex = getApplicationContext();
+                        Toast toast = Toast.makeText(contex, "Unable to disconnect: " + e.toString(), duration);
+                        toast.show();
+                    }
+
+                }
+                else {
+                    btConnect();
+                    button.setText("DISCONNECT");
+                }
+            }
+        });
     }
 
     public void btConnect() {
@@ -100,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     socketConnect();
 
                     if(skConnected == true) {
-                        rpmStat();
+                        liveData();
                     }
                 }
             }
@@ -129,16 +169,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void rpmStat() {
+    public void liveData() {
         final TextView rpmView = (TextView) findViewById(R.id.rpm_id);
+        final TextView mphView = (TextView) findViewById(R.id.mph_id);
+        final TextView tposView = (TextView) findViewById(R.id.tpos_id);
+        final TextView fuelView = (TextView) findViewById(R.id.fuel_id);
+        final TextView fuelTypeView = (TextView) findViewById(R.id.fuel_type);
 
         runnable = new Runnable() {
             @Override
             public void run() {
                 try {
                     RPMCommand engineRpmCommand = new RPMCommand();
+                    SpeedCommand mphCommand = new SpeedCommand();
+                    ThrottlePositionCommand tposCommand = new ThrottlePositionCommand();
+                    FuelLevelCommand fuelCommand = new FuelLevelCommand();
+                    FindFuelTypeCommand fuelTypeCommand = new FindFuelTypeCommand();
+
                     engineRpmCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    rpmView.setText("RPM: " + engineRpmCommand.getCalculatedResult());
+                    mphCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    tposCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    fuelCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    fuelTypeCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+
+                    rpmView.setText(engineRpmCommand.getCalculatedResult());
+                    mphView.setText(mphCommand.getCalculatedResult());
+                    tposView.setText(tposCommand.getCalculatedResult());
+                    fuelView.setText(fuelCommand.getCalculatedResult());
+                    fuelTypeView.setText(fuelTypeCommand.getName());
                 }
                 catch (Exception e){
                     // handle errors
@@ -146,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast toast = Toast.makeText(contex, "RPM Error: " + e.toString(), duration);
                     toast.show();
                 }
-                handler.postDelayed(runnable, 250);
+                handler.postDelayed(runnable, 100);
             }
         };
         handler.post(runnable);
