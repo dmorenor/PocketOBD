@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             new EchoOffCommand().run(mmSocket.getInputStream(), mmSocket.getOutputStream());
             new LineFeedOffCommand().run(mmSocket.getInputStream(), mmSocket.getOutputStream());
             new TimeoutCommand(125).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-            new SelectProtocolCommand(ObdProtocols.AUTO).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+            new SelectProtocolCommand(ObdProtocols.ISO_15765_4_CAN).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
 
             contex = getApplicationContext();
             Toast toast = Toast.makeText(contex, "Connection successful", duration);
