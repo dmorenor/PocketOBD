@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.engine.OilTempCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
 import com.github.pires.obd.commands.fuel.FindFuelTypeCommand;
@@ -28,10 +29,12 @@ import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
+import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
 import com.github.pires.obd.enums.FuelType;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -47,14 +50,22 @@ public class MainActivity extends AppCompatActivity {
     Runnable runnable;
     Handler handler = new Handler();
 
-
-
+    private TextView rpmView;
+    private TextView mphView;
+    private TextView tposView;
+    private TextView fuelView;
+    private TextView airTempView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Button button = (Button) findViewById(R.id.button);
+        rpmView = (TextView) findViewById(R.id.rpm_id);
+        mphView = (TextView) findViewById(R.id.mph_id);
+        tposView = (TextView) findViewById(R.id.tpos_id);
+        fuelView = (TextView) findViewById(R.id.fuel_id);
+        airTempView = (TextView) findViewById(R.id.airtemp_id);
 
         btConnect();
 
@@ -68,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
                         mmSocket.close();
                         button.setText("CONNECT");
                         btConnected = false;
+                        rpmView.setText("0");
+                        mphView.setText("0");
+                        tposView.setText("0");
+                        fuelView.setText("0");
+                        airTempView.setText("0");
                     }
                     catch (IOException e) {
                         // Error
@@ -170,11 +186,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void liveData() {
-        final TextView rpmView = (TextView) findViewById(R.id.rpm_id);
-        final TextView mphView = (TextView) findViewById(R.id.mph_id);
-        final TextView tposView = (TextView) findViewById(R.id.tpos_id);
-        final TextView fuelView = (TextView) findViewById(R.id.fuel_id);
-        final TextView fuelTypeView = (TextView) findViewById(R.id.fuel_type);
 
         runnable = new Runnable() {
             @Override
@@ -184,19 +195,25 @@ public class MainActivity extends AppCompatActivity {
                     SpeedCommand mphCommand = new SpeedCommand();
                     ThrottlePositionCommand tposCommand = new ThrottlePositionCommand();
                     FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
-                    FindFuelTypeCommand fuelTypeCommand = new FindFuelTypeCommand();
+                    //OilTempCommand oilTempCommand = new OilTempCommand();
 
                     engineRpmCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     mphCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     tposCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     fuelLevelCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    fuelTypeCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    //oilTempCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+
+                    float throttlePos = tposCommand.getPercentage();
+                    throttlePos = round(throttlePos, 2);
+
+                    float fuelLevel = fuelLevelCommand.getFuelLevel();
+                    fuelLevel = round(fuelLevel, 2);
 
                     rpmView.setText(engineRpmCommand.getCalculatedResult());
                     mphView.setText(mphCommand.getCalculatedResult());
-                    tposView.setText(Float.toString(tposCommand.getPercentage()));
-                    fuelView.setText(Float.toString(fuelLevelCommand.getFuelLevel()));
-                    fuelTypeView.setText(fuelTypeCommand.getCalculatedResult());
+                    tposView.setText(Float.toString(throttlePos));
+                    fuelView.setText(Float.toString(fuelLevel));
+                    //airTempView.setText(oilTempCommand.getName());
                 }
                 catch (Exception e){
                     // handle errors
@@ -208,6 +225,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         handler.post(runnable);
+    }
+
+    public static float round(float number, int decPoint) {
+        int num = 10;
+        for (int i = 1; i < decPoint; i++)
+            num *= 10;
+        float tmp = number * num;
+        return ( (float) ( (int) ((tmp - (int) tmp) >= 0.5f ? tmp + 1 : tmp) ) ) / num;
     }
 
     @Override

@@ -182,11 +182,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="21dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="60dp"
         android:layout_marginLeft="225dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="60dp"
         android:layout_marginStart="225dp"
-        android:layout_marginTop="295dp"
+        android:layout_marginTop="300dp"
         android:text="0"
         android:textColor="@android:color/white"
         android:textSize="35sp"
@@ -199,7 +199,7 @@
         android:id="@+id/fuel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="80dp"
         android:layout_marginEnd="68dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="68dp"
@@ -208,7 +208,7 @@
         android:text="Fuel Level (%)"
         android:textColor="@android:color/white"
         android:textSize="10sp"
-        app:layout_constraintBottom_toTopOf="@+id/fuel_type"
+        app:layout_constraintBottom_toTopOf="@+id/textView5"
         app:layout_constraintEnd_toStartOf="@+id/textView"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/textView4"
@@ -216,31 +216,13 @@
         app:layout_constraintVertical_bias="0.531" />
 
     <TextView
-        android:id="@+id/fuel_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
-        android:layout_marginEnd="6dp"
-        android:layout_marginLeft="170dp"
-        android:layout_marginRight="6dp"
-        android:layout_marginStart="170dp"
-        android:layout_marginTop="40dp"
-        android:text=""
-        android:textColor="@android:color/white"
-        android:textSize="10sp"
-        app:layout_constraintBottom_toTopOf="@+id/textView5"
-        app:layout_constraintEnd_toStartOf="@+id/textView5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <TextView
         android:id="@+id/fuel_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="7dp"
-        android:layout_marginEnd="150dp"
+        android:layout_marginEnd="190dp"
         android:layout_marginLeft="26dp"
-        android:layout_marginRight="150dp"
+        android:layout_marginRight="190dp"
         android:layout_marginStart="26dp"
         android:layout_marginTop="195dp"
         android:text="0"
@@ -250,6 +232,45 @@
         app:layout_constraintEnd_toStartOf="@+id/textView"
         app:layout_constraintStart_toEndOf="@+id/textView4"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/airtemp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="11dp"
+        android:layout_marginLeft="157dp"
+        android:layout_marginRight="11dp"
+        android:layout_marginStart="157dp"
+        android:layout_marginTop="15dp"
+        android:text="Air Intake Temp (F°)"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/textView5"
+        app:layout_constraintHorizontal_bias="0.46"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/airtemp_id" />
+
+    <TextView
+        android:id="@+id/airtemp_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="260dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="175dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginStart="175dp"
+        android:layout_marginTop="10dp"
+        android:text="0"
+        android:textColor="@android:color/white"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+
 
     <Button
         android:id="@+id/button"
