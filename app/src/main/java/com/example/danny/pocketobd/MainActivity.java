@@ -203,6 +203,9 @@ public class MainActivity extends AppCompatActivity {
                     fuelLevelCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     //oilTempCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
 
+                    //float mphConvert = mphCommand.getImperialSpeed();
+                    //mphConvert = round(mphConvert, 2);
+
                     float throttlePos = tposCommand.getPercentage();
                     throttlePos = round(throttlePos, 2);
 
@@ -210,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                     fuelLevel = round(fuelLevel, 2);
 
                     rpmView.setText(engineRpmCommand.getCalculatedResult());
-                    mphView.setText(mphCommand.getCalculatedResult());
+                    mphView.setText(Float.toString(mphCommand.getImperialSpeed()));
                     tposView.setText(Float.toString(throttlePos));
                     fuelView.setText(Float.toString(fuelLevel));
                     //airTempView.setText(oilTempCommand.getName());
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 catch (Exception e){
                     // handle errors
                     contex = getApplicationContext();
-                    Toast toast = Toast.makeText(contex, "RPM Error: " + e.toString(), duration);
+                    Toast toast = Toast.makeText(contex, "Live data Error: " + e.toString(), duration);
                     toast.show();
                 }
                 handler.postDelayed(runnable, 100);
