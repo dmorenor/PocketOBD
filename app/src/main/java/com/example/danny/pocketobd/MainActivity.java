@@ -20,21 +20,18 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.github.pires.obd.commands.SpeedCommand;
-import com.github.pires.obd.commands.engine.OilTempCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
-import com.github.pires.obd.commands.fuel.FindFuelTypeCommand;
 import com.github.pires.obd.commands.fuel.FuelLevelCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
-import com.github.pires.obd.enums.FuelType;
+import com.github.pires.obd.commands.temperature.EngineCoolantTemperatureCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     Boolean skConnected = false;
     Context contex;
     int duration = Toast.LENGTH_SHORT;
+    int rounded = 0;
+    int rounded2 = 0;
+    int rounded3 = 0;
+    float convert = 0;
+    float convert2 = 0;
     Runnable runnable;
     Handler handler = new Handler();
 
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tposView;
     private TextView fuelView;
     private TextView airTempView;
+    private TextView coolantTempView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         tposView = (TextView) findViewById(R.id.tpos_id);
         fuelView = (TextView) findViewById(R.id.fuel_id);
         airTempView = (TextView) findViewById(R.id.airtemp_id);
+        coolantTempView = (TextView) findViewById(R.id.cooltemp_id);
 
         btConnect();
 
@@ -84,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
                         tposView.setText("0");
                         fuelView.setText("0");
                         airTempView.setText("0");
+                        coolantTempView.setText("0");
+                        contex = getApplicationContext();
+                        Toast toast = Toast.makeText(contex, "Bluetooth connection terminated", duration);
+                        toast.show();
                     }
                     catch (IOException e) {
                         // Error
@@ -101,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Allows user to select bluetooth adapter and creates connection
     public void btConnect() {
         ArrayList deviceStrs = new ArrayList();
         final ArrayList devices = new ArrayList();
@@ -166,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    //Inplements input/output stream for bluetooth socket
     public void socketConnect() {
         try {
             new EchoOffCommand().run(mmSocket.getInputStream(), mmSocket.getOutputStream());
@@ -174,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             new SelectProtocolCommand(ObdProtocols.ISO_15765_4_CAN).run(mmSocket.getInputStream(), mmSocket.getOutputStream());
 
             contex = getApplicationContext();
-            Toast toast = Toast.makeText(contex, "Connection successful", duration);
+            Toast toast = Toast.makeText(contex, "Reading live data", duration);
             toast.show();
             skConnected = true;
         } catch (Exception e) {
@@ -185,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Handles live data read and display
     public void liveData() {
 
         runnable = new Runnable() {
@@ -195,16 +206,18 @@ public class MainActivity extends AppCompatActivity {
                     SpeedCommand mphCommand = new SpeedCommand();
                     ThrottlePositionCommand tposCommand = new ThrottlePositionCommand();
                     FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
-                    //OilTempCommand oilTempCommand = new OilTempCommand();
+                    AirIntakeTemperatureCommand airTempCommand =  new AirIntakeTemperatureCommand();
+                    EngineCoolantTemperatureCommand engTempCommand =  new EngineCoolantTemperatureCommand();
 
                     engineRpmCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     mphCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     tposCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
                     fuelLevelCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
-                    //oilTempCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    airTempCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
+                    engTempCommand.run(mmSocket.getInputStream(), mmSocket.getOutputStream());
 
-                    //float mphConvert = mphCommand.getImperialSpeed();
-                    //mphConvert = round(mphConvert, 2);
+                    float mphConvert = mphCommand.getImperialSpeed();
+                    rounded = Math.round(mphConvert);
 
                     float throttlePos = tposCommand.getPercentage();
                     throttlePos = round(throttlePos, 2);
@@ -212,11 +225,22 @@ public class MainActivity extends AppCompatActivity {
                     float fuelLevel = fuelLevelCommand.getFuelLevel();
                     fuelLevel = round(fuelLevel, 2);
 
+                    String air = airTempCommand.getCalculatedResult();
+                    convert = Float.parseFloat(air);
+                    convert = (9/5) * convert + 32;
+                    rounded2 = Math.round(convert);
+
+                    String coolant = engTempCommand.getCalculatedResult();
+                    convert2 = Float.parseFloat(coolant);
+                    convert2 = (9/5) * convert2 + 32;
+                    rounded3 = Math.round(convert2);
+
                     rpmView.setText(engineRpmCommand.getCalculatedResult());
-                    mphView.setText(Float.toString(mphCommand.getImperialSpeed()));
+                    mphView.setText(Integer.toString(rounded));
                     tposView.setText(Float.toString(throttlePos));
                     fuelView.setText(Float.toString(fuelLevel));
-                    //airTempView.setText(oilTempCommand.getName());
+                    airTempView.setText(Integer.toString(rounded2));
+                    coolantTempView.setText(Integer.toString(rounded3));
                 }
                 catch (Exception e){
                     // handle errors
@@ -230,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
         handler.post(runnable);
     }
 
+    //Rounding function
     public static float round(float number, int decPoint) {
         int num = 10;
         for (int i = 1; i < decPoint; i++)
@@ -238,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
         return ( (float) ( (int) ((tmp - (int) tmp) >= 0.5f ? tmp + 1 : tmp) ) ) / num;
     }
 
+    //Ends threads when app is terminated
     @Override
     protected void onDestroy() {
         super.onDestroy();
